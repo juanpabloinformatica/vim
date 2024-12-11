@@ -27,7 +27,8 @@ set relativenumber
 set ruler
 set nocompatible
 filetype plugin indent on
-colorscheme industry
+colorscheme retrobox
+set background=dark
 
 "---------------------------------- Plugins ------------------------------
 "
@@ -59,6 +60,8 @@ call plug#begin()
 Plug 'airblade/vim-gitgutter'
 " For commenting
 Plug 'tpope/vim-commentary'
+" For pairing brackets, parentheses .....
+Plug 'Raimondi/delimitMate'
 " for fuzzy finding
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
@@ -68,6 +71,8 @@ Plug 'editorconfig/editorconfig-vim'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 " For C/C++ Highlighting
 Plug 'bfrg/vim-c-cpp-modern'
+" zoom tab
+Plug 'troydm/zoomwintab.vim'
 call plug#end()
 
 
@@ -124,6 +129,13 @@ nmap <leader>fm  <Plug>(coc-format-selected)
 " " Example: `<leader>aap` for current paragraph
 xmap <leader>ca  <Plug>(coc-codeaction-selected)
 nmap <leader>ca  <Plug>(coc-codeaction-selected)
+" Remap keys for applying code actions at the cursor position
+ nmap <leader>cac  <Plug>(coc-codeaction-cursor)
+ " Remap keys for apply code actions affect whole buffer
+ nmap <leader>cas  <Plug>(coc-codeaction-source)
+ " Apply the most preferred quickfix action to fix diagnostic on the current
+" line
+ nmap <leader>qf  <Plug>(coc-fix-current)
 
 " Run the Code Lens action on the current line
  nmap <leader>cl  <Plug>(coc-codelens-action)
@@ -153,10 +165,25 @@ function! ShowDocumentation()
 endfunction
 
 "Commands
+
 "Allowing fzf passing flags
 " Allow passing optional flags into the Rg command.
 "    Example: :Rg myterm -g '*.md'
-command! -bang -nargs=* Rg call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case " . <q-args>, 1, fzf#vim#with_preview(), <bang>0)
+" command! -bang -nargs=* Rg call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case ".<q-args>, fzf#vim#with_preview(), <bang>0)
+command! -bang -nargs=* Rg call fzf#vim#grep(
+    \   'rg
+        \ --column
+        \ --line-number
+        \ --no-heading
+        \ --fixed-strings
+        \ --ignore-case
+        \ --hidden
+        \ --follow
+        \ --glob "!.git/*"
+        \ --color "always" '.shellescape(<q-args>),
+        \   fzf#vim#with_preview('right:50%:hidden', '?'),
+        \   <bang>0)
+
 " coc - doc -----> Highlight the symbol and its references when holding the cursor
 autocmd CursorHold * silent call CocActionAsync('highlight')
 " Add `:Fold` command to fold current buffer
@@ -179,3 +206,6 @@ augroup end
 let g:EditorConfig_exclude_patterns = ['fugitive://.*']
 " ---> Adding relative number to newtr
 let g:netrw_bufsettings="noma nomod nonu nobl nowrap ro rnu"
+
+"Useful commands
+"cdo execute "normal @register_selected" | write
