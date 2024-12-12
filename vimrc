@@ -44,8 +44,6 @@ let data_dir =  '~/.config/vim'
 if empty(glob(data_dir.'/autoload/plug.vim'))
   silent !curl -fLo ~/.config/vim/autoload/plug.vim --create-dirs
     \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-else
-  echo "Is working as expected"
 endif
 
 " Run PlugInstall if there are missing plugins
