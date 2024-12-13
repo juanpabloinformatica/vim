@@ -1,11 +1,21 @@
 "----------------------------------Options -----------------------------
+"
 "encoding
+"
+"
+"
 set encoding=utf-8
 set fileencoding=utf-8
 set fileencodings=utf-8
 "General
 set signcolumn="yes"
 set undofile
+set mouse="a"
+set showtabline=1
+set termguicolors
+set timeoutlen=400
+set updatetime=250
+
 " this will set the undodir in the same project 
 set undodir="."
 set undolevels=10000
@@ -13,6 +23,7 @@ set hlsearch
 set expandtab
 set shiftwidth=2
 set smartindent
+set tabstop=2
 set softtabstop=2
 set ignorecase
 set smartcase
@@ -26,9 +37,12 @@ set number
 set relativenumber
 set ruler
 set nocompatible
-filetype plugin indent on
-colorscheme retrobox
 set background=dark
+" part of the options with not set 
+syntax enable
+colorscheme retrobox
+filetype plugin indent on
+
 
 "---------------------------------- Plugins ------------------------------
 "
@@ -184,6 +198,17 @@ nmap <leader>ca  <Plug>(coc-codeaction-selected)
 
 "Functions
 "
+" mine for set correct editing in markdow files
+function SetMarkdownOptions()
+  echo "Entering here"
+  setlocal tabstop=2 
+  setlocal softtabstop=2
+  setlocal shiftwidth=2
+  setlocal expandtab
+  setlocal autoindent
+  setlocal smartindent
+endfunction
+
 " coc --> functions
 " I need to check this one !!!!
 function! CheckBackspace() abort  
@@ -200,6 +225,10 @@ function! ShowDocumentation()
 endfunction
 
 "Commands
+" --mines
+
+"  for mkdown files
+autocmd BufRead,BufNewFile *.md call SetMarkdownOptions()
 
 " I need to check how can i make this work
 "Allowing fzf passing flags
@@ -242,6 +271,10 @@ augroup end
 let g:EditorConfig_exclude_patterns = ['fugitive://.*']
 " ---> Adding relative number to newtr
 let g:netrw_bufsettings="noma nomod nonu nobl nowrap ro rnu"
+" trying this for changing block to beam at insert mode
+let &t_SI = "\<Esc>[6 q"
+let &t_SR = "\<Esc>[4 q"
+let &t_EI = "\<Esc>[2 q"
 
 " from coc-snippet
 "
