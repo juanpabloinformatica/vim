@@ -1,23 +1,20 @@
 "----------------------------------Options -----------------------------
-"
+" mines
 "encoding
-"
-"
-"
 set encoding=utf-8
 set fileencoding=utf-8
 set fileencodings=utf-8
 "General
 set signcolumn="yes"
 set undofile
-set mouse="a"
+set mouse=a
 set showtabline=1
 set termguicolors
 set timeoutlen=400
 set updatetime=250
 
 " this will set the undodir in the same project 
-set undodir="."
+" set undodir="."
 set undolevels=10000
 set hlsearch
 set expandtab
@@ -44,8 +41,6 @@ colorscheme retrobox
 filetype plugin indent on
 
 
-"---------------------------------- Plugins ------------------------------
-"
 " ------------------------------- Setting Plug --------------------------
 
 "let data_dir =  '~/.vim'
@@ -65,30 +60,35 @@ autocmd VimEnter * if len(filter(values(g:plugs), '!isdirectory(v:val.dir)'))
   \| PlugInstall --sync | source $MYVIMRC
 \| endif
 
+"---------------------------------- Plugins ------------------------------
+"
+"mines
 call plug#begin()
-
-
 " List your plugins here
 " Plug 'tpope/vim-sensible'
 " I will add vim-gitgutter
 Plug 'airblade/vim-gitgutter'
 " For commenting
-Plug 'tpope/vim-commentary'
+ Plug 'tpope/vim-commentary'
 " For pairing brackets, parentheses .....
 Plug 'Raimondi/delimitMate'
 " for fuzzy finding
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
+
 " For editorconfig
 Plug 'editorconfig/editorconfig-vim'
 " For Having an LSP client in vim
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 " For C/C++ Highlighting
 Plug 'bfrg/vim-c-cpp-modern'
-" zoom tab
+" zoom tab 
 Plug 'troydm/zoomwintab.vim'
 " For snippets
 Plug 'honza/vim-snippets'
+" For showing marks
+Plug 'kshenoy/vim-signature'
+
 call plug#end()
 
 
@@ -102,9 +102,16 @@ nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j 
 nnoremap <C-k> <C-w>k 
 nnoremap <C-l> <C-w>l 
-nnoremap <silent> <leader>fb :Buffers<CR>
+nnoremap <silent><leader>fb :Buffers<CR>
 nnoremap <silent><leader>fg  :Rg<CR>
-nnoremap <silent> <leader>ff :FZF -m<CR>
+nnoremap <silent><leader>ff :FZF -m<CR>
+nnoremap <C-d> <C-d>zz
+nnoremap <C-u> <C-u>zz
+"vnoremap > >gv
+"vnoremap < <gv
+"vnoremap J :>+1<CR>gv=gv
+"vnoremap K :<-2<CR>gv=gv
+nnoremap <leader>cmc :call RunCmake()<CR>
 
 
 " Coc ---> autocompletition keymap
@@ -198,7 +205,9 @@ nmap <leader>ca  <Plug>(coc-codeaction-selected)
 
 "Functions
 "
-" mine for set correct editing in markdow files
+" mines 
+"
+" for set correct editing in markdow files
 function SetMarkdownOptions()
   echo "Entering here"
   setlocal tabstop=2 
@@ -207,6 +216,36 @@ function SetMarkdownOptions()
   setlocal expandtab
   setlocal autoindent
   setlocal smartindent
+endfunction
+
+
+function RunCmake()
+  " call GenerateBuild
+  let optionRun = input('0 -> make | 1 -> make run | 2 -> make check: ')
+  let buildFolder = system("git rev-parse --show-toplevel| tr -d '\\n'")."/build"
+  if isdirectory(buildFolder)
+    if optionRun == '0'
+      echo "I enter option 0"
+      execute 'make -C' .. buildFolder
+    elseif optionRun == '1'
+      echo "I enter option 2"
+      echo "Not working yet"
+      execute 'make run -C' .. buildFolder
+    elseif optionRun =='2'
+      echo "I enter option 2"
+      execute 'make check -C' .. buildFolder
+    endif
+  else
+    echo "You need to create the build directory"
+    let optionBuild = input('1 -> Build | 0 -> Not build ')
+    let cmakeFile = system("git rev-parse --show-toplevel| tr -d '\\n'").'/CMakeLists.txt'
+    if optionBuild == '1' && filereadable(cmakeFile)
+      execute 'mkdir build'
+      execute 'cmake -B' .. buildFolder
+    else
+      echo "You need to create cmake"
+    endif
+  endif
 endfunction
 
 " coc --> functions
@@ -259,6 +298,7 @@ command! -nargs=? Fold :call     CocAction('fold', <f-args>)
 command! -nargs=0 Format :call CocActionAsync('format')
 
 "Groups
+" mines
 augroup mygroup
   autocmd!
     " Setup formatexpr specified filetype(s)
@@ -267,7 +307,10 @@ augroup mygroup
        autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
 
+
 "---> seting g:let variables ---------------
+
+"mines
 let g:EditorConfig_exclude_patterns = ['fugitive://.*']
 " ---> Adding relative number to newtr
 let g:netrw_bufsettings="noma nomod nonu nobl nowrap ro rnu"
