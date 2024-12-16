@@ -4,6 +4,7 @@
 set encoding=utf-8
 set fileencoding=utf-8
 set fileencodings=utf-8
+
 "General
 set signcolumn="yes"
 set undofile
@@ -12,7 +13,8 @@ set showtabline=1
 set termguicolors
 set timeoutlen=400
 set updatetime=250
-
+set grepprg=rg\ --vimgrep
+set grepformat^=%f:%l:%c:%m
 " this will set the undodir in the same project 
 " set undodir="."
 set undolevels=10000
@@ -37,7 +39,7 @@ set nocompatible
 set background=dark
 " part of the options with not set 
 syntax enable
-colorscheme retrobox
+" colorscheme gruvbox
 filetype plugin indent on
 
 
@@ -85,12 +87,17 @@ Plug 'bfrg/vim-c-cpp-modern'
 " zoom tab 
 Plug 'troydm/zoomwintab.vim'
 " For snippets
-Plug 'honza/vim-snippets'
+" Plug 'honza/vim-snippets'
 " For showing marks
 Plug 'kshenoy/vim-signature'
+" For colorscheme
+Plug 'morhetz/gruvbox'
 
 call plug#end()
 
+
+" This is isolated because it depends on the gruvbox plugin
+colorscheme gruvbox
 
 " Use release branch (recommended)
 
@@ -104,14 +111,17 @@ nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l 
 nnoremap <silent><leader>fb :Buffers<CR>
 nnoremap <silent><leader>fg  :Rg<CR>
-nnoremap <silent><leader>ff :FZF -m<CR>
+nnoremap <silent><leader>ff :Files <CR>
 nnoremap <C-d> <C-d>zz
 nnoremap <C-u> <C-u>zz
-"vnoremap > >gv
-"vnoremap < <gv
-"vnoremap J :>+1<CR>gv=gv
-"vnoremap K :<-2<CR>gv=gv
+vnoremap > >gv
+vnoremap < <gv
+vnoremap <silent> J :m '>+1<cr>gv=gv
+vnoremap <silent> K :m '<-2<cr>gv=gv
 nnoremap <leader>cmc :call RunCmake()<CR>
+inoremap jj <ESC>:noh<CR>
+
+
 
 
 " Coc ---> autocompletition keymap
@@ -167,23 +177,23 @@ xmap <leader>fm  <Plug>(coc-format-selected)
 nmap <leader>fm  <Plug>(coc-format-selected)
 " Applying code actions to the selected code block
 " " Example: `<leader>aap` for current paragraph
-xmap <leader>ca  <Plug>(coc-codeaction-selected)
-nmap <leader>ca  <Plug>(coc-codeaction-selected)
+" xmap <leader>ca  <Plug>(coc-codeaction-selected)
+" nmap <leader>ca  <Plug>(coc-codeaction-selected)
 " Remap keys for applying code actions at the cursor position
- nmap <leader>cac  <Plug>(coc-codeaction-cursor)
+ " nmap <leader>cac  <Plug>(coc-codeaction-cursor)
  " Remap keys for apply code actions affect whole buffer
- nmap <leader>cas  <Plug>(coc-codeaction-source)
+ " nmap <leader>cas  <Plug>(coc-codeaction-source)
  " Apply the most preferred quickfix action to fix diagnostic on the current
 " line
  nmap <leader>qf  <Plug>(coc-fix-current)
 
 " Run the Code Lens action on the current line
- nmap <leader>cl  <Plug>(coc-codelens-action)
+ " nmap <leader>cl  <Plug>(coc-codelens-action)
  
 " Remap keys for applying refactor code actions
- nmap <silent> <leader>re <Plug>(coc-codeaction-refactor)
- xmap <silent> <leader>r  <Plug>(coc-codeaction-refactor-selected)
- nmap <silent> <leader>r  <Plug>(coc-codeaction-refactor-selected)
+ " nmap <silent> <leader>re <Plug>(coc-codeaction-refactor)
+ " xmap <silent> <leader>r  <Plug>(coc-codeaction-refactor-selected)
+ " nmap <silent> <leader>r  <Plug>(coc-codeaction-refactor-selected)
 
  " Coc-snippet
  "Use <C-l> for trigger snippet expand.
@@ -209,7 +219,7 @@ nmap <leader>ca  <Plug>(coc-codeaction-selected)
 "
 " for set correct editing in markdow files
 function SetMarkdownOptions()
-  echo "Entering here"
+  " echo "Entering here"
   setlocal tabstop=2 
   setlocal softtabstop=2
   setlocal shiftwidth=2
@@ -249,7 +259,7 @@ function RunCmake()
 endfunction
 
 " coc --> functions
-" I need to check this one !!!!
+
 function! CheckBackspace() abort  
 let col = col('.') - 1 
 return !col || getline('.')[col - 1]  =~# '\s'
@@ -287,7 +297,9 @@ autocmd BufRead,BufNewFile *.md call SetMarkdownOptions()
 "         \ --color "always" '.shellescape(<q-args>),
 "         \   fzf#vim#with_preview('right:50%:hidden', '?'),
 "         \   <bang>0)
-
+" for a previewer in files
+command! -bang -nargs=? -complete=dir Files
+    \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
 " coc - doc -----> Highlight the symbol and its references when holding the cursor
 autocmd CursorHold * silent call CocActionAsync('highlight')
 " Add `:Fold` command to fold current buffer
